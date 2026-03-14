@@ -148,6 +148,4 @@ Alternatively, if you prefer to run them separately:
 |:---:|:---:|
 | `[Screenshot of File Upload Sidebar]` | `[Screenshot of Chat Interface and Answer]` |
 
----
-**Author:** AI Engineer / Candidate
-**Target Role:** AI/ML Internship Evaluation
+**Author:** Sudip Kumar Prasad
