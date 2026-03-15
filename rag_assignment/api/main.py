@@ -3,6 +3,12 @@ import tempfile
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from pydantic import BaseModel
 from typing import List, Optional
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+# We look for .env in the same directory as this file's parent (rag_assignment/)
+base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+load_dotenv(os.path.join(base_dir, ".env"))
 
 # Local imports
 from utils.document_processor import DocumentProcessor
