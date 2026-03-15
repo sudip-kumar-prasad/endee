@@ -1,8 +1,8 @@
 # 🎓 Endee SDE Internship Assignment
 
-> **Note for Evaluators:**  
-> The SDE/ML Internship Assignment (RAG Application) is located in the [`rag_assignment/`](./rag_assignment/) directory!
-> Please navigate to that folder or view the [Assignment README](./rag_assignment/README.md) for full project details, architecture, and setup instructions.
+> [!IMPORTANT]
+> **The SDE/ML Internship Assignment (RAG Application) is located in the [`rag_assignment/`](./rag_assignment/) directory!**  
+> All relevant code, system design, and execution instructions can be found there.
 
 ---
 

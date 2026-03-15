@@ -3,7 +3,7 @@ uvicorn
 streamlit
 langchain
 langchain-community
-langchain-openai
+google-genai
 sentence-transformers
 python-multipart
 pypdf

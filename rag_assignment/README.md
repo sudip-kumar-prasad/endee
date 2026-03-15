@@ -1,12 +1,12 @@
-# 🚀 Endee RAG Application
+# 🚀 Endee RAG Assistant
 
-An AI-powered Semantic Search and Retrieval Augmented Generation (RAG) system built using the **Endee Vector Database**, **FastAPI**, and **Streamlit**.
+An AI-powered Semantic Search and Retrieval Augmented Generation (RAG) system built using the **Endee Vector Database**, **FastAPI**, and **Google Gemini**.
 
 ## 📑 Project Overview
 
-This project demonstrates a real-world AI application where users can upload documents (PDF/Text) and ask questions in natural language. The system retrieves the most relevant document chunks using vector similarity from Endee, and generates a final comprehensive answer using an LLM. 
+This project demonstrates a real-world AI application where users can upload documents (PDF/Text) and ask questions in natural language. The system retrieves the most relevant document chunks using vector similarity from Endee, and generates a final comprehensive answer using the **Gemini 1.5 Flash** LLM.
 
-This repository was designed to evaluate capabilities in vector databases, semantic search, backend API engineering, and AI toolchains.
+This repository was designed to evaluate capabilities in vector databases, semantic search, backend API engineering, and AI toolchains as part of the Endee SDE/ML Internship Assignment.
 
 ## 🎯 Problem Statement
 
@@ -14,12 +14,13 @@ Traditional keyword search fails to understand context and semantic meaning. Fur
 
 ## ✨ Features
 
-- **Document Ingestion:** Upload PDF, Markdown, and TXT files.
+- **Document Ingestion:** Upload PDF and TXT files.
 - **Smart Chunking:** Automatic, overlap-aware text splitting using `RecursiveCharacterTextSplitter`.
-- **Local Embedding Generation:** Utlizes `SentenceTransformers` (`all-MiniLM-L6-v2`) locally, keeping sensitive data processing private.
-- **Vector Search:** Fast semantic retrieval powered by **Endee Vector Database**.
+- **Local Embedding Generation:** Utilizes `SentenceTransformers` (`all-MiniLM-L6-v2`) locally, keeping sensitive data processing private and efficient.
+- **Vector Search:** Fast semantic retrieval powered by the **Endee Vector Database**.
 - **Dual Service Architecture:** Separation of concerns using a **FastAPI** robust backend and a **Streamlit** interactive UI.
-- **Mock/Real LLM Toggle:** Can seamlessly switch between an OpenAI generated response (if an API key is provided) or a safe mock response for immediate demonstration.
+- **Gemini Integration:** Powered by `gemini-1.5-flash` for high-quality, grounded responses.
+- **Polished Personality:** Handles greetings and introductions politely while remaining strictly grounded in your document data for factual queries.
 
 ## 🏗 System Architecture Diagram
 
@@ -50,7 +51,7 @@ graph TD
         I -- Embed Query --> G
         G -- Vector Query --> H
         H -- Search Results Top-K --> I
-        I -- Context + Prompt --> J{LLM}
+        I -- Context + Prompt --> J{Google Gemini}
         J -- Final Answer --> D
     end
     
@@ -59,10 +60,10 @@ graph TD
 
 ## 🧠 How Endee Vector Database is used
 
-In this application, Endee forms the core memory of the system:
-1. **Creation:** We initialize a collection within Endee (`rag_collection`).
-2. **Upsertion:** When a document is uploaded, it gets chunked and mapped to a 384-dimensional dense vector space. We call the `EndeeClient.upsert()` method to store these vectors alongside metadata (the original raw text of the chunk and the source filename).
-3. **Retrieval (Semantic Search):** Upon a user query, the question is embedded into the same 384-dimensional space. `EndeeClient.query()` computes cosine similarity to locate the top *K* nearest embeddings. Endee retrieves our associated metadata, allowing precisely the matching source text to be routed to the contextual LLM.
+In this application, Endee forms the core semantic memory of the system:
+1. **Creation:** We initialize a collection within Endee to store document embeddings.
+2. **Upsertion:** When a document is uploaded, it gets chunked and mapped to a 384-dimensional dense vector space. We use the Endee API to store these vectors alongside metadata (the original raw text of the chunk and the source filename).
+3. **Retrieval (Semantic Search):** Upon a user query, the question is embedded into the same 384-dimensional space. The system performs a vector search in Endee to locate the top *K* nearest chunks using cosine similarity. Endee retrieves the associated metadata, allowing precisely the matching source text to be routed to the contextual LLM (Gemini).
 
 ## 🛠 Project Structure
 
@@ -70,18 +71,18 @@ In this application, Endee forms the core memory of the system:
 Endee_Assignment/
 ├── api/                
 │   └── main.py              # FastAPI application & entrypoints
-├── data/                    # Storage directory for uploads/dbs (if local Endee)
+├── docs/assets/             # Project screenshots and diagrams
 ├── embeddings/        
 │   └── embedder.py          # SentenceTransformers wrapping layer
 ├── rag_pipeline/      
-│   └── generator.py         # The RAG orchestrator mapping Endee hits to LLMs
+│   └── generator.py         # The RAG orchestrator mapping Endee hits to Gemini
 ├── ui/                 
 │   └── app.py               # Streamlit chat & document upload frontend
 ├── utils/              
 │   └── document_processor.py# Logic for loading and chunking PDFs/Text
 ├── vector_store/       
-│   └── endee_client.py      # Endee API instantiation and method wrappers
-├── .env.example             # Template for API keys configuration
+│   └── endee_client.py      # Endee REST API client with in-memory fallback
+├── .env.example             # Template for Gemini API key
 ├── app.py                   # Runner script initializing API and UI simultaneously
 ├── requirements.txt         # Core dependencies
 └── README.md                # This file
@@ -91,7 +92,7 @@ Endee_Assignment/
 
 ### Prerequisites
 - Python 3.9+
-- An active Endee instance or API key (falling back to a local instance assuming Endee supports local mode natively).
+- An active Endee instance listening on `http://localhost:8080` (The application includes a client that automatically falls back to an in-memory mock if the server isn't running, ensuring the RAG pipeline is always testable).
 
 ### Setup
 
@@ -103,49 +104,37 @@ Endee_Assignment/
 
 2. **Create a virtual environment:**
    ```bash
-   python -m venv venv
+   python3 -m venv venv
    source venv/bin/activate  # On Windows: venv\Scripts\activate
    ```
 
 3. **Install Dependencies:**
    ```bash
-   pip install -r requirements.txt
+   pip3 install -r requirements.txt
    ```
 
 4. **Environment Variables:**
-   Copy `.env.example` to `.env` and fill in necessary information.
+   Copy `.env.example` to `.env` and add your Gemini API key.
    ```bash
    cp .env.example .env
+   # Open .env and set GEMINI_API_KEY=your_key_here
    ```
-   *Note: If `OPENAI_API_KEY` is not provided, the application will default to a mock LLM output demonstrating the successful Endee lookup.*
 
 ## 🚀 How to run the project locally
 
 You can run the full stack simultaneously using the application runner:
 
 ```bash
-python app.py
+python3 app.py
 ```
 
 This script will automatically boot the FastAPI backend on `http://localhost:8000` and the Streamlit UI on `http://localhost:8501`.
 
-Alternatively, if you prefer to run them separately:
-- **Terminal 1 (Backend):** `uvicorn api.main:app --host 0.0.0.0 --port 8000`
-- **Terminal 2 (Frontend):** `streamlit run ui/app.py`
-
-## 💡 Example Queries
-
-1. Create a `sample.txt` file with content: *"The Endee Vector Database utilizes a proprietary Vector Graph Engine (VGE) which provides sub-5 millisecond query latency and horizontal scaling."*
-2. Upload `sample.txt` through the sidebar in the Streamlit UI.
-3. In the chat input, ask: **"What kind of engine does the Endee Database use?"**
-4. Observe the LLM answering specifically using the retrieved context from the database!
-
 ## 📸 Screenshots
 
-*(Placeholders for UI deployment screenshots)*
-
-| Document Ingestion | Semantic Search QA |
+| Dashboard Interface | Working RAG Pipeline (Gemini Answer) |
 |:---:|:---:|
-| `[Screenshot of File Upload Sidebar]` | `[Screenshot of Chat Interface and Answer]` |
+| ![Dashboard Home](./docs/assets/home_page.png) | ![Final Answer](./docs/assets/final_answers.png) |
 
+---
 **Author:** Sudip Kumar Prasad

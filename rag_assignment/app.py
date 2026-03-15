@@ -2,6 +2,11 @@ import subprocess
 import time
 import sys
 import os
+from dotenv import load_dotenv
+
+# Load .env BEFORE spawning subprocesses so they inherit the env vars
+load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), ".env"))
+
 
 def check_env():
     """Ensure essential directory structure exists."""
@@ -23,7 +28,8 @@ def main():
     backend = subprocess.Popen(
         [sys.executable, "-m", "uvicorn", "api.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"],
         stdout=sys.stdout,
-        stderr=sys.stderr
+        stderr=sys.stderr,
+        env=os.environ.copy()
     )
     
     # Wait a moment for backend to initialize before starting frontend
@@ -34,7 +40,8 @@ def main():
     frontend = subprocess.Popen(
         [sys.executable, "-m", "streamlit", "run", "ui/app.py", "--server.port", "8501"],
         stdout=sys.stdout,
-        stderr=sys.stderr
+        stderr=sys.stderr,
+        env=os.environ.copy()
     )
     
     try:
