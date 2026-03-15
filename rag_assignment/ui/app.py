@@ -1,12 +1,47 @@
 import streamlit as st
 import requests
 import os
+import subprocess
+import sys
+import time
+import socket
 from dotenv import load_dotenv
 
 load_dotenv()
 
 # Assuming the FastAPI backend runs on 8000
 API_URL = os.getenv("API_URL", "http://localhost:8000")
+
+def is_backend_running(host="localhost", port=8000):
+    """Check if the backend port is open."""
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        return s.connect_ex((host, port)) == 0
+
+def start_backend():
+    """Start the FastAPI backend as a subprocess."""
+    if not is_backend_running():
+        st.info("Backend not detected. Starting FastAPI backend...")
+        # Get the path to the backend directory (one level up from ui/)
+        base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        
+        # Start uvicorn as a subprocess
+        # Note: We use sys.executable to ensure we use the same python interpreter/venv
+        subprocess.Popen(
+            [sys.executable, "-m", "uvicorn", "api.main:app", "--host", "0.0.0.0", "--port", "8000"],
+            cwd=base_dir,
+            stdout=subprocess.DEVNULL, # Suppress logs in the UI
+            stderr=subprocess.DEVNULL,
+            env=os.environ.copy()
+        )
+        # Wait a few seconds for startup
+        time.sleep(5)
+        if is_backend_running():
+            st.success("Backend started successfully!")
+        else:
+            st.warning("Backend starting in background. Attempting to connect...")
+
+# Ensure backend is running before any UI interaction
+start_backend()
 
 st.set_page_config(
     page_title="Endee RAG Assistant",
