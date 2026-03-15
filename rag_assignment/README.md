@@ -97,8 +97,8 @@ Endee_Assignment/
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/sudip-kumar-prasad/Endee_Assignment.git
-   cd Endee_Assignment
+   git clone https://github.com/sudip-kumar-prasad/endee.git
+   cd endee/rag_assignment
    ```
 
 2. **Create a virtual environment:**
