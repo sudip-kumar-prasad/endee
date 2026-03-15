@@ -16,6 +16,12 @@ load_dotenv(dotenv_path=env_path)
 # We use 127.0.0.1 instead of localhost to avoid IPv6 resolution issues on macOS
 API_URL = os.getenv("API_URL", "http://127.0.0.1:8000")
 
+st.set_page_config(
+    page_title="Endee RAG Assistant",
+    page_icon="🤖",
+    layout="wide"
+)
+
 def is_backend_running(host="127.0.0.1", port=8000):
     """Check if the backend port is open."""
     try:
@@ -51,18 +57,12 @@ def start_backend():
 # Ensure backend is running before any UI interaction
 start_backend()
 
-st.set_page_config(
-    page_title="Endee RAG Assistant",
-    page_icon="🤖",
-    layout="wide"
-)
-
 st.title("🤖 Endee RAG Assistant")
 st.markdown("Upload a PDF or Text document, and then ask questions about it using Semantic Search powered by Endee Vector Database.")
 
 # Sidebar for Upload
 with st.sidebar:
-    st.header("1. Upload Documents")
+    st.header("Upload Documents")
     uploaded_file = st.file_uploader("Choose a PDF or TXT file", type=["pdf", "txt", "md"])
     
     if st.button("Ingest Document"):
@@ -98,7 +98,7 @@ with st.sidebar:
         st.error(f"❌ Backend: Disconnected ({str(e)})")
 
 # Main area for chatting/querying
-st.header("2. Ask Questions")
+st.header("Ask Questions")
 
 # Initialize chat history
 if "messages" not in st.session_state:
