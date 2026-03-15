@@ -7,7 +7,10 @@ import time
 import socket
 from dotenv import load_dotenv
 
-load_dotenv()
+# Explicitly load .env from the parent directory (rag_assignment/.env)
+base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+env_path = os.path.join(base_dir, ".env")
+load_dotenv(dotenv_path=env_path)
 
 # Assuming the FastAPI backend runs on 8000
 API_URL = os.getenv("API_URL", "http://localhost:8000")
