@@ -75,6 +75,22 @@ with st.sidebar:
         else:
             st.warning("Please select a file first.")
 
+    st.divider()
+    st.header("⚙️ System Status")
+    try:
+        health_resp = requests.get(f"{API_URL}/health")
+        if health_resp.status_code == 200:
+            health = health_resp.json()
+            st.success("✅ Backend: Connected")
+            if health.get("gemini_initialized"):
+                st.success("✅ Gemini: Ready")
+            else:
+                st.warning("⚠️ Gemini: Mock Mode (Check .env)")
+        else:
+            st.error("❌ Backend: Error")
+    except Exception:
+        st.error("❌ Backend: Disconnected")
+
 # Main area for chatting/querying
 st.header("2. Ask Questions")
 

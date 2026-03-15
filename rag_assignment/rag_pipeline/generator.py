@@ -5,6 +5,11 @@ from typing import List, Dict, Any
 from vector_store.endee_client import EndeeDB
 from embeddings.embedder import Embedder
 from langchain_core.prompts import PromptTemplate
+from dotenv import load_dotenv
+
+# Try to load .env from multiple potential locations
+load_dotenv() # Current directory
+load_dotenv(os.path.join(os.path.dirname(os.path.dirname(__file__)), ".env")) # Parent directory
 
 
 PROMPT_TEMPLATE = """You are a helpful and polite AI assistant. 
@@ -28,15 +33,17 @@ class RAGPipeline:
         self.embedder = embedder
         self.vector_db = vector_db
 
-        gemini_key = os.environ.get("GEMINI_API_KEY", "")
+        gemini_key = os.environ.get("GEMINI_API_KEY", "").strip()
         if gemini_key:
             self.client = genai.Client(api_key=gemini_key)
             self.use_mock_llm = False
-            print("✅ Gemini LLM initialized (gemini-flash-latest)")
+            masked_key = gemini_key[:4] + "..." + gemini_key[-4:] if len(gemini_key) > 8 else "****"
+            print(f"✅ Gemini LLM initialized (gemini-flash-latest) with key: {masked_key}")
         else:
             self.client = None
             self.use_mock_llm = True
-            print("⚠️  No GEMINI_API_KEY found. Using mock LLM.")
+            print("⚠️  No GEMINI_API_KEY found in environment. Using mock LLM.")
+            print(f"Debug: os.environ keys: {list(os.environ.keys())[-10:]}") # Show last 10 for sanity
 
     def generate_answer(self, question: str, top_k: int = 3) -> Dict[str, Any]:
         """

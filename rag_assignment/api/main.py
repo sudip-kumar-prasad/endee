@@ -108,4 +108,7 @@ async def query_rag(request: QueryRequest):
 
 @app.get("/health")
 def health_check():
-    return {"status": "ok"}
+    return {
+        "status": "ok",
+        "gemini_initialized": not rag_pipe.use_mock_llm
+    }
