@@ -130,9 +130,9 @@ python3 app.py
 
 This script will automatically boot the FastAPI backend on `http://localhost:8000` and the Streamlit UI on `http://localhost:8501`.
 
-## 🎬 Live Demo Recording (Premium Dark Mode)
+## 🎬 Live Demo Recording
 
-![Endee RAG Demo](./docs/assets/demo_dark.webp)
+![Endee RAG Demo](./docs/assets/demo.webp)
 
 ## 📸 Screenshots
 
