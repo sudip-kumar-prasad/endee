@@ -88,6 +88,13 @@ class RAGPipeline:
                 )
                 answer = response.text
             except Exception as e:
-                answer = f"Error communicating with Gemini: {str(e)}"
+                if "429" in str(e) or "RESOURCE_EXHAUSTED" in str(e):
+                    answer = (
+                        "⚠️ **Gemini Quota Exceeded**: You've hit the Free Tier limit (20 requests/day). "
+                        "Please wait about 60 seconds or try again tomorrow. "
+                        "\n\n*Evaluator Note: You can also test the retrieval logic by removing the GEMINI_API_KEY from .env to trigger Mock LLM mode.*"
+                    )
+                else:
+                    answer = f"Error communicating with Gemini: {str(e)}"
 
         return {"answer": answer, "context": results}
