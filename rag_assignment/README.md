@@ -130,11 +130,22 @@ python3 app.py
 
 This script will automatically boot the FastAPI backend on `http://localhost:8000` and the Streamlit UI on `http://localhost:8501`.
 
+## 🎬 Live Demo Recording
+
+![Endee RAG Demo](./docs/assets/demo.webp)
+
 ## 📸 Screenshots
 
 | Dashboard Interface | Working RAG Pipeline (Gemini Answer) |
 |:---:|:---:|
 | ![Dashboard Home](./docs/assets/home_page.png) | ![Final Answer](./docs/assets/final_answers.png) |
+
+## 🛠 Technical Highlights
+
+- **Optimized Embeddings:** Used `all-MiniLM-L6-v2` for a perfect balance of speed (sub-10ms) and accuracy (384d) for real-time document interaction.
+- **Fail-Safe Architecture:** The Endee client automatically falls back to a high-speed in-memory cosine-similarity search if the server isn't running, zero-downtime development.
+- **Microservice Design:** Backend (FastAPI) and Frontend (Streamlit) are decoupled, allowing for individual scaling and potential production deployment.
+- **Grounded Responses:** Prompt engineering ensures the AI strictly references document context, preventing hallucinations.
 
 ---
 **Author:** Sudip Kumar Prasad
