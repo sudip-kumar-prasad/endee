@@ -13,12 +13,17 @@ env_path = os.path.join(base_dir, ".env")
 load_dotenv(dotenv_path=env_path)
 
 # Assuming the FastAPI backend runs on 8000
-API_URL = os.getenv("API_URL", "http://localhost:8000")
+# We use 127.0.0.1 instead of localhost to avoid IPv6 resolution issues on macOS
+API_URL = os.getenv("API_URL", "http://127.0.0.1:8000")
 
-def is_backend_running(host="localhost", port=8000):
+def is_backend_running(host="127.0.0.1", port=8000):
     """Check if the backend port is open."""
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        return s.connect_ex((host, port)) == 0
+    try:
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            s.settimeout(1)
+            return s.connect_ex((host, port)) == 0
+    except:
+        return False
 
 def start_backend():
     """Start the FastAPI backend as a subprocess."""
@@ -89,10 +94,8 @@ with st.sidebar:
                 st.success("✅ Gemini: Ready")
             else:
                 st.warning("⚠️ Gemini: Mock Mode (Check .env)")
-        else:
-            st.error("❌ Backend: Error")
-    except Exception:
-        st.error("❌ Backend: Disconnected")
+    except Exception as e:
+        st.error(f"❌ Backend: Disconnected ({str(e)})")
 
 # Main area for chatting/querying
 st.header("2. Ask Questions")
