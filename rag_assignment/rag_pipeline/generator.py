@@ -53,14 +53,18 @@ class RAGPipeline:
         results = self.vector_db.search(query_embedding=query_embedding, limit=top_k)
         context_texts = [res.get("text", "") for res in results]
 
-        if not context_texts:
+        # Prepare prompt
+        context_string = "\n\n---\n\n".join(context_texts) if context_texts else "No document context available yet."
+        prompt = PROMPT_TEMPLATE.format(context=context_string, question=question)
+
+        # Handle simple greetings even with empty context
+        is_greeting = any(word in question.lower() for word in ["hello", "hi ", "hii", "hey", "who are you"])
+        
+        if not context_texts and not is_greeting:
             return {
                 "answer": "I don't have enough context in the vector database to answer. Please upload a document first.",
                 "context": []
             }
-
-        context_string = "\n\n---\n\n".join(context_texts)
-        prompt = PROMPT_TEMPLATE.format(context=context_string, question=question)
 
         print("Generating answer with Gemini...")
         if self.use_mock_llm:
